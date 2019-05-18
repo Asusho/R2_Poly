@@ -1,0 +1,94 @@
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+'Growbot
+        'Define I/O
+spkr    CON  8  '  On-board speaker
+Lled    CON  11  '  Right LED
+rightWheel   CON   13  '  Right Wheel (servo)
+leftWheel  CON  12  '  Left Wheel (servo)
+Rled    CON  15  '  Left LED
+
+
+P1 VAR IN1
+INPUT 1
+P2 VAR IN2
+INPUT 2
+P3 VAR IN3
+INPUT 3
+
+
+        'Define RAM used
+temp    VAR  Byte  '  Temporary Byte
+speed    VAR  Word  '  Holds desired speed of wheels
+steer    VAR  Word  '  Holds control word for steering
+counter  VAR  Byte  '    @@@
+single2 VAR Byte
+
+        'Define Constants
+rightOff  CON  566  '   "off" pulse for servo
+leftOff  CON  750  '   "off" pulse for servo
+
+
+single2=0
+
+Main:
+  'FORWARD (P1,P2,P3) = 001
+  'BACKWARD (P1,P2,P3) = 011
+  'LEFT (P1,P2,P3) = 010
+  'RIGHT (P1,P2,P3) = 110
+  'STOP (P1,P2,P3) = 111
+  'KLAXON (P1,P2,P3) = 101
+  IF (P1=0) AND (P2=0) AND (P3=1) THEN GOTO forward                           'AVANCE
+  IF (P1=0) AND (P2=1) AND (P3=1) THEN GOTO backward                          'RECULE
+  IF (P1=0) AND (P2=1) AND (P3=0) THEN GOTO Turn_Left                         'GAUCHE
+  IF (P1=1) AND (P2=1) AND (P3=0) THEN GOTO Turn_Right                        'DROITE
+  IF (P1=1) AND (P2=1) AND (P3=1) THEN GOTO Main                              'STOP
+  IF (P1=1) AND (P2=0) AND (P3=1) THEN GOTO klaxon                            'KLAXON
+  IF (P1=0) AND (P2=0) AND (P3=0) THEN IF (single2=0) THEN GOTO Not_an_Order  'ORDRE NON RECONNU
+  GOTO Main
+  END
+
+
+forward:
+  temp = 20 : speed = 80 : steer = 31
+  GOSUB drive
+  GOTO Main
+
+backward:
+  temp =20 : speed = -80 : steer = -45
+  GOSUB drive
+  GOTO Main
+
+Turn_Left:
+  temp = 20 : speed = 50 : steer = -50
+  GOSUB drive
+  GOTO Main
+
+Turn_Right:
+  temp = 39 : speed = 150 : steer = 150
+  GOSUB drive
+  GOTO Main
+
+
+klaxon:
+  FREQOUT spkr,400,800  'c4,db5
+  PAUSE 100
+  FREQOUT spkr,400,800  'f4,e5
+  single2=0
+  GOTO Main
+
+
+Not_an_Order:
+  FREQOUT spkr,200,1024  'c4,db5
+  FREQOUT spkr,200,600  'f4,e5
+  single2 = 1
+  GOTO Main
+
+drive:
+  FOR counter = 0 TO temp
+    PULSOUT  leftWheel,leftOff + speed + speed + speed + steer
+    PULSOUT rightWheel,rightOff - speed + steer
+    PAUSE 40
+  NEXT
+  single2 = 0
+  RETURN
