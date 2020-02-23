@@ -2,9 +2,9 @@
 #include <pic.h>
 
 char interval = 96;
-char front_to_send = 0; // Le nombre de front à envoyer, s'il est modifié
+char front_to_send = 0; // Le nombre de front ï¿½ envoyer, s'il est modifiï¿½
 
-// Délai d'attente de n * 50 itérations de boucle
+// Dï¿½lai d'attente de n * 50 itï¿½rations de boucle
 void delai (char n) {
 	while (n > 0) {
 		char i = 0;
@@ -13,7 +13,7 @@ void delai (char n) {
 	}
 }
 
-// Envoie un certain nombre de fronts dans l'émetteur
+// Envoie un certain nombre de fronts dans l'ï¿½metteur
 void front (char n) {
 
 // Envoie n fronts
@@ -34,9 +34,10 @@ void front (char n) {
 void main(void){
 	PORTA = 0;
     PORTB = 0;
-    TRISB = 0b11111111; // Port B en entrée
+    TRISB = 0b11111111; // Port B en entrï¿½e
     TRISA = 0b00000000; // Port A en sortie
 
+	// loop
 	while(1){
 
 		char f = front_to_send;
